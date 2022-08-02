@@ -6,8 +6,12 @@ const Item = require('../models/url.model')
 router.route('/create')
   .post(async (req, res) => {
     // TODO: create short url
-    const doc = await Item.create(req.body);
-    res.send(doc)
+    try {
+      const doc = await Item.create(req.body);
+      res.send(doc)
+    } catch (e) {
+      res.send({ "message": e.message })
+    }
   })
 
 router.route('/:id')
