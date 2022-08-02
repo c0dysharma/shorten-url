@@ -1,10 +1,13 @@
 const express = require('express')
 const router = express.Router();
 
+const Item = require('../models/url.model')
+
 router.route('/create')
-  .post((req, res) => {
+  .post(async (req, res) => {
     // TODO: create short url
-    res.send(req.body.message)
+    const doc = await Item.create(req.body);
+    res.send(doc)
   })
 
 router.route('/:id')
