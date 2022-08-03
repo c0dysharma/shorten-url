@@ -30,7 +30,7 @@ const controllers= {
 
       const doc = await Item.create({ alias, urls })
       createUrl(doc)
-      return res.send({ url: doc.urls, message })
+      return res.send({ urls: doc.urls, message })
     } catch (error) {
       res.status(500).send({ "message": error.message, urls: {} })
     }
