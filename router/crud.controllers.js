@@ -7,8 +7,9 @@ import config from '../config.js'
 // changes longUrl to shortUrl with alias
 function createUrl(res) {
   let { alias, urls } = res;
-  Object.keys(urls).forEach(k => {
-    urls[k] = `${config.ip}/${alias}/${k}`
+  Object.keys(urls).forEach(tail => {
+    if(tail != '/')  urls[tail] = `${config.ip}/${alias}/${tail}`
+    else urls[tail] = `${config.ip}/${alias}`
   })
 }
 const controllers= {
