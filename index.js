@@ -13,9 +13,10 @@ app.use('/', crudRoutes)
 
 async function start() {
   try {
-    await mongoose.connect('mongodb://127.0.0.1/shorten-url');
-    app.listen(config.port, () => {
-      console.log(`Listening on PORT: ${config.port}`)
+    await mongoose.connect(`mongodb://127.0.0.1/shorten-url`)
+    console.log('Databse Connected');
+    app.listen(config.port, config.ip, () => {
+      console.log(`Listening on: ${config.ip}:${config.port}`)
     })
   } catch (error) {
     console.error('Server Startup error->', error)
