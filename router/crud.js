@@ -18,22 +18,34 @@ router.route('/create')
         const found = await Item.findOne({ alias })
         if (found) {
           alias = await nanoid();
-          if(!aliasNotPassed) message = 'Alias not Avaliable'
+          if (!aliasNotPassed) message = 'Alias not Avaliable'
         }
       }
 
       const doc = await Item.create({ alias, urls })
       createUrl(doc)
       return res.send({ url: doc.urls, message })
-    } catch (e) {
-      res.status(500).send({ "message": e.message, urls:{} })
+    } catch (error) {
+      res.status(500).send({ "message": error.message, urls: {} })
     }
   })
 
-router.route('/:id')
-  .get((req, res) => {
-    // TODO: redirect to long url
-    res.send('redirect to long url')
+router.route('/:id/:tail?')
+  .get(async (req, res) => {
+    try {
+      const { id, tail } = req.params;
+      const doc = await Item.findOne({ 'alias': id })
+      if (!doc) return res.status(404).send({ message: 'Not found' })
+      if (tail) return res.redirect(doc.urls[tail])
+
+      if (doc.urls['/'])
+        return res.redirect(doc.urls['/'])
+      else
+        return res.send({ urls: doc.urls, message: "No root url found" })
+
+    } catch (error) {
+      res.status(500).send({ "message": error.message, urls: {} })
+    }
   })
   .put((req, res) => {
     // TODO: update urls
@@ -44,10 +56,10 @@ router.route('/:id')
     res.send('deleting the url')
   })
 
-function createUrl(res){
-  let { alias, urls} = res;
-  Object.keys(urls).forEach(k=>{
-    urls[k] = `${config.ip}/${alias}${k}`
+function createUrl(res) {
+  let { alias, urls } = res;
+  Object.keys(urls).forEach(k => {
+    urls[k] = `${config.ip}/${alias}/${k}`
   })
 }
 
