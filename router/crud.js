@@ -73,9 +73,13 @@ router.route('/:id/:tail?')
       res.status(500).send({ "message": error.message, urls: {} })
     }
   })
-  .delete((req, res) => {
-    // TODO: Deleting the url
-    res.send('deleting the url')
+  .delete(async (req, res) => {
+    const { id } = req.params;
+    const doc = await Item.findOne({ 'alias': id })
+    if (!doc) return res.status(404).send({ message: 'Not found' })
+
+    const deletedDoc = await Item.findByIdAndDelete(doc._id)
+    return res.send({ urls: deletedDoc.urls, message: "OK" })
   })
 
 function createUrl(res) {
