@@ -29,8 +29,8 @@ router.route('/create')
       res.status(500).send({ "message": error.message, urls: {} })
     }
   })
-  .get((req, res)=>{
-    res.status(405).send({message: 'Bad request'})
+  .get((req, res) => {
+    res.status(405).send({ message: 'Bad request' })
   })
 
 router.route('/:id/:tail?')
@@ -39,7 +39,12 @@ router.route('/:id/:tail?')
       const { id, tail } = req.params;
       const doc = await Item.findOne({ 'alias': id })
       if (!doc) return res.status(404).send({ message: 'Not found' })
-      if (tail) return res.redirect(doc.urls[tail])
+
+      if (tail) {
+        if (doc.urls[tail])
+          return res.redirect(doc.urls[tail])
+        else return res.status(404).send({ "message": "No tail found", urls: doc.urls })
+      }
 
       if (doc.urls['/'])
         return res.redirect(doc.urls['/'])
@@ -50,9 +55,23 @@ router.route('/:id/:tail?')
       res.status(500).send({ "message": error.message, urls: {} })
     }
   })
-  .put((req, res) => {
-    // TODO: update urls
-    res.send('updating urls')
+  .put(async (req, res) => {
+    try {
+      const { id } = req.params;
+      const doc = await Item.findOne({ 'alias': id })
+      if (!doc) return res.status(404).send({ message: 'Not found' })
+
+      const { urls: newUrls } = req.body;
+      Object.keys(newUrls).forEach(k => {
+        if (doc.urls[k]) doc.urls[k] = newUrls[k] // key exists: update
+        else doc.urls[k] = newUrls[k];  // add a new key value pair
+      })
+      const newDoc = await Item.findByIdAndUpdate(doc._id, { urls: doc.urls }, { runValidators: true, new: true })
+      res.send({ urls: newDoc.urls, message: "OK" })
+
+    } catch (error) {
+      res.status(500).send({ "message": error.message, urls: {} })
+    }
   })
   .delete((req, res) => {
     // TODO: Deleting the url
