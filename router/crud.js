@@ -29,6 +29,9 @@ router.route('/create')
       res.status(500).send({ "message": error.message, urls: {} })
     }
   })
+  .get((req, res)=>{
+    res.status(405).send({message: 'Bad request'})
+  })
 
 router.route('/:id/:tail?')
   .get(async (req, res) => {
