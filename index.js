@@ -9,7 +9,10 @@ const app = express()
 app.use(express.json())
 app.use(morgan('dev'))
 app.use('/', crudRoutes)
-
+app.use((err, req, res, next) => {
+  res.status(500).send({ message: err.message, urls: {} })
+  next()
+})
 
 async function start() {
   try {
