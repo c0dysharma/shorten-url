@@ -1,15 +1,15 @@
 import { customAlphabet } from 'nanoid/async'
 const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 5)
+import 'dotenv/config'
 
 import Item from '../models/url.model.js'
-import config from '../config.js'
 
 // changes longUrl to shortUrl with alias
 function createUrl(res) {
   let { alias, urls } = res;
   Object.keys(urls).forEach(tail => {
-    if(tail != '/')  urls[tail] = `${config.ip}/${alias}/${tail}`
-    else urls[tail] = `${config.ip}/${alias}`
+    if(tail != '/')  urls[tail] = `${process.env.SERVER_URL}/${alias}/${tail}`
+    else urls[tail] = `${process.env.SERVER_URL}/${alias}`
   })
 }
 const controllers= {

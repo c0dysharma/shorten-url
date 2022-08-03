@@ -1,6 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose';
 import morgan from 'morgan'
+import 'dotenv/config'
 
 import config from './config.js'
 import crudRoutes from './router/crud.js'
@@ -16,7 +17,7 @@ app.use((err, req, res, next) => {
 
 async function start() {
   try {
-    await mongoose.connect(`mongodb://127.0.0.1/shorten-url`)
+    await mongoose.connect(process.env.MONGO_URL)
     console.log('Databse Connected');
     app.listen(config.port, config.ip, () => {
       console.log(`Listening on: ${config.ip}:${config.port}`)
