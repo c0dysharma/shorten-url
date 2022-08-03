@@ -1,16 +1,29 @@
-const express = require('express')
+import express from 'express'
+import { nanoid } from 'nanoid/async'
+
+import Item from '../models/url.model.js'
+
 const router = express.Router();
-
-const Item = require('../models/url.model')
-
 router.route('/create')
   .post(async (req, res) => {
-    // TODO: create short url
     try {
-      const doc = await Item.create(req.body);
-      res.send(doc)
+      let { alias, urls } = req.body;
+      let message = 'OK';
+
+      if (!alias) alias = await nanoid(10);
+
+      else {
+        const found = await Item.findOne({ alias })
+        if (found) {
+          alias = await nanoid(10);
+          message = 'Alias not Avaliable'
+        }
+
+        const doc = await Item.create({ alias, urls })
+        return res.send({ url: doc.urls, message })
+      }
     } catch (e) {
-      res.send({ "message": e.message })
+      res.status(500).send({ "message": e.message, urls:{} })
     }
   })
 
@@ -28,4 +41,4 @@ router.route('/:id')
     res.send('deleting the url')
   })
 
-module.exports = router
+export default router
