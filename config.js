@@ -17,6 +17,4 @@ const config = {
     return flag;
   }
 }
-
-
-module.exports = config
+export default config

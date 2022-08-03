@@ -1,9 +1,9 @@
-const express = require('express')
-const mongoose = require('mongoose');
-const morgan = require('morgan')
+import express from 'express'
+import mongoose from 'mongoose';
+import morgan from 'morgan'
 
-const config = require('./config')
-const crudRoutes = require('./router/crud')
+import config from './config.js'
+import crudRoutes from './router/crud.js'
 
 const app = express()
 app.use(express.json())

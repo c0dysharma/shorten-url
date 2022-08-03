@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { validatURL } = require('../config');
+import mongoose from 'mongoose';
+import config from '../config.js'
 const Schema = mongoose.Schema;
 
 
@@ -13,10 +13,10 @@ const itemSchema = new Schema({
     type: Object,
     required: true,
     validate: {
-      validator: validatURL,
+      validator: config.validatURL,
       message: "Not a valid url format"
     }
   }
 })
 
-module.exports = mongoose.model('item', itemSchema)
+export default mongoose.model('item', itemSchema)
