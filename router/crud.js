@@ -62,11 +62,7 @@ router.route('/:id/:tail?')
       if (!doc) return res.status(404).send({ message: 'Not found' })
 
       const { urls: newUrls } = req.body;
-      Object.keys(newUrls).forEach(k => {
-        if (doc.urls[k]) doc.urls[k] = newUrls[k] // key exists: update
-        else doc.urls[k] = newUrls[k];  // add a new key value pair
-      })
-      const newDoc = await Item.findByIdAndUpdate(doc._id, { urls: doc.urls }, { runValidators: true, new: true })
+      const newDoc = await Item.findByIdAndUpdate(doc._id, { urls: newUrls }, { runValidators: true, new: true })
       res.send({ urls: newDoc.urls, message: "OK" })
 
     } catch (error) {
