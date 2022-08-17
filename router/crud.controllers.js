@@ -6,14 +6,20 @@ import Item from '../models/url.model.js'
 
 // changes longUrl to shortUrl with alias
 function createUrl(res) {
-  let { alias, urls } = res;
-  Object.keys(urls).forEach(tail => {
-    if(tail != '/')  urls[tail] = `${process.env.SERVER_URL}/${alias}/${tail}`
-    else urls[tail] = `${process.env.SERVER_URL}/${alias}`
-  })
+  let newOb = JSON.parse(JSON.stringify(res)); // deep copy
+  let { alias, urls } = newOb;
+
+  // create urls only if alias and url is there
+  if (alias && urls) {
+    Object.keys(urls).forEach(tail => {
+      if (tail != '/') urls[tail] = `${process.env.SERVER_URL}/${alias}/${tail}`
+      else urls[tail] = `${process.env.SERVER_URL}/${alias}`
+    })
+    return newOb;
+  } return null;
 }
-const controllers= {
-  createPage : async (req, res) => {
+const controllers = {
+  createPage: async (req, res) => {
     try {
       let { alias, urls } = req.body;
       let message = 'OK';
@@ -29,14 +35,23 @@ const controllers= {
       }
 
       const doc = await Item.create({ alias, urls })
-      createUrl(doc)
-      return res.send({ urls: doc.urls, message })
+      const newOb = createUrl(doc)
+      if (newOb)
+        return res.send({ urls: newOb.urls, message })
+      else
+        throw Error('Some Alias or Url is missing.')
+
     } catch (error) {
       res.status(500).send({ "message": error.message, urls: {} })
     }
   },
-  createPageGet: (req, res) => {
-    res.status(405).send({ message: 'Bad request' })
+  createPageGet: async (req, res) => {
+    try {
+      const docs = await Item.find({});
+      res.status(200).send({ data: docs })
+    } catch (error) {
+      res.status(500).send({ "message": error.message, urls: {} })
+    }
   },
   readURL: async (req, res) => {
     try {
@@ -74,14 +89,14 @@ const controllers= {
     }
   },
   deleteURL: async (req, res) => {
-    try{
+    try {
       const { id } = req.params;
       const doc = await Item.findOne({ 'alias': id })
       if (!doc) return res.status(404).send({ message: 'Not found' })
-  
+
       const deletedDoc = await Item.findByIdAndDelete(doc._id)
       return res.send({ urls: deletedDoc.urls, message: "OK" })
-    }catch(error){
+    } catch (error) {
       res.status(500).send({ "message": error.message, urls: {} })
     }
   }
